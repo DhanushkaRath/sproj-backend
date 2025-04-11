@@ -36,9 +36,13 @@ wss.on('connection', (ws) => {
 // Middleware
 app.use(express.json());
 
+// Middleware
+app.use(express.json());
+
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow non-browser requests
+    if (!origin) return callback(null, true); // allow non-browser tools like Postman
+
     const allowedOrigins = [
       'https://fed-storefront-frontend-dhanushka.netlify.app'
     ];
@@ -49,8 +53,14 @@ app.use(cors({
     } else {
       callback(new Error('Not allowed by CORS'));
     }
-  }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
+
 
 
 // Initialize Clerk
