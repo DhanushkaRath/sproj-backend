@@ -35,15 +35,23 @@ wss.on('connection', (ws) => {
 
 // Middleware
 app.use(express.json());
+
 app.use(cors({
-  origin: [
-    'https://fed-storefront-frontend-dhanushka.netlify.app',
-    '*'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser requests
+    const allowedOrigins = [
+      'https://fed-storefront-frontend-dhanushka.netlify.app'
+    ];
+    const localhostPattern = /^http:\/\/localhost:\d+$/;
+
+    if (allowedOrigins.includes(origin) || localhostPattern.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 }));
+
 
 // Initialize Clerk
 app.use(clerkMiddleware());
