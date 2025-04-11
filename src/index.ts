@@ -36,30 +36,24 @@ wss.on('connection', (ws) => {
 // Middleware
 app.use(express.json());
 
-// CORS configuration
-const corsOptions = {
-  origin: 'https://fed-storefront-frontend-dhanushka.netlify.app',
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser requests
+    const allowedOrigins = [
+      'https://fed-storefront-frontend-dhanushka.netlify.app'
+    ];
+    const localhostPattern = /^http:\/\/localhost:\d+$/;
+
+    if (allowedOrigins.includes(origin) || localhostPattern.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-};
-
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
-// Handle preflight requests
-app.options('*', cors(corsOptions));
-
-// Add headers middleware
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://fed-storefront-frontend-dhanushka.netlify.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
-});
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 // Initialize Clerk
 app.use(clerkMiddleware());
