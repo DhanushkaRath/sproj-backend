@@ -36,51 +36,12 @@ wss.on('connection', (ws) => {
 // Middleware
 app.use(express.json());
 
-// Middleware
-app.use(express.json());
-
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow non-browser tools like Postman
-
-    const allowedOrigins = [
-      'https://fed-storefront-frontend-dhanushka.netlify.app',
-      'https://fed-storefront-backend-dhanushka.onrender.com',
-      'http://localhost:5174',
-      'http://localhost:5173',
-      'http://localhost:3000'
-    ];
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: 'https://fed-storefront-frontend-dhanushka.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  exposedHeaders: ['Content-Range', 'X-Content-Range']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
-
-// Add specific CORS headers for the home page routes
-app.use('/api/products', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://fed-storefront-frontend-dhanushka.netlify.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
-});
-
-app.use('/api/categories', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://fed-storefront-frontend-dhanushka.netlify.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
-});
 
 // Initialize Clerk
 app.use(clerkMiddleware());
