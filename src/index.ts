@@ -41,12 +41,12 @@ wss.on('connection', (ws, req) => {
 // Middleware
 app.use(express.json());
 
-// Enable CORS logging
+// Add request logging middleware
 app.use((req, res, next) => {
   console.log('Incoming request:', {
     method: req.method,
-    origin: req.headers.origin,
     path: req.path,
+    origin: req.headers.origin,
     headers: req.headers
   });
   next();
@@ -54,13 +54,30 @@ app.use((req, res, next) => {
 
 // Simplified CORS configuration
 app.use(cors({
-  origin: [
-    'https://fed-storefront-frontend-dhanushka.netlify.app',
-    'http://localhost:5174',
-    'http://localhost:5175',
-    'http://localhost:5173',
-    'http://localhost:8000'
-  ],
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Allow all Netlify domains (main and preview)
+    if (origin.includes('netlify.app')) {
+      return callback(null, true);
+    }
+
+    // Allow local development
+    const allowedOrigins = [
+      'http://localhost:5174',
+      'http://localhost:5175',
+      'http://localhost:5173',
+      'http://localhost:8000'
+    ];
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   credentials: true,
@@ -94,6 +111,12 @@ app.use("/api/payments", paymentsRouter);
 
 // Error handling
 app.use(globalErrorHandlingMiddleware);
+
+// Add error logging middleware
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error('Error:', err);
+  next(err);
+});
 
 // Database connection
 connectDB();
