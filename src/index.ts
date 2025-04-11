@@ -46,10 +46,12 @@ app.use(cors({
     const allowedOrigins = [
       'https://fed-storefront-frontend-dhanushka.netlify.app',
       'https://fed-storefront-backend-dhanushka.onrender.com',
+      'http://localhost:5174',
+      'http://localhost:5173',
+      'http://localhost:3000'
     ];
-    const localhostPattern = /^http:\/\/localhost:\d+$/;
 
-    if (allowedOrigins.includes(origin) || localhostPattern.test(origin)) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -59,10 +61,26 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
   preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
+  exposedHeaders: ['Content-Range', 'X-Content-Range']
 }));
 
+// Add specific CORS headers for the home page routes
+app.use('/api/products', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://fed-storefront-frontend-dhanushka.netlify.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
+app.use('/api/categories', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://fed-storefront-frontend-dhanushka.netlify.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
 // Initialize Clerk
 app.use(clerkMiddleware());
