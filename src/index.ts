@@ -44,7 +44,8 @@ app.use(cors({
     if (!origin) return callback(null, true); // allow non-browser tools like Postman
 
     const allowedOrigins = [
-      'https://fed-storefront-frontend-dhanushka.netlify.app'
+      'https://fed-storefront-frontend-dhanushka.netlify.app',
+      'https://fed-storefront-backend-dhanushka.onrender.com',
     ];
     const localhostPattern = /^http:\/\/localhost:\d+$/;
 
