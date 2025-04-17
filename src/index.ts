@@ -35,18 +35,9 @@ wss.on('connection', (ws) => {
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-  origin: [
-    'https://fed-storefront-frontend-dhanushka.netlify.app',
-    'http://localhost:5173',
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-
-// Initialize Clerk
 app.use(clerkMiddleware());
+app.use(cors({ origin: "https://fed-storefront-frontend-dhanushka.netlify.app" }));
+
 
 // Routes
 app.use("/api/products", productRouter);
@@ -62,7 +53,7 @@ connectDB();
 
 // Start server
 const PORT = process.env.PORT || 8000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`WebSocket server running on ws://localhost:${PORT}/ws/orders`);
-});
+server.listen(PORT, () => 
+  console.log(`Server running on port ${PORT}`)
+);
+  
