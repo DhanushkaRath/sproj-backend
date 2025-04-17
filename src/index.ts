@@ -36,7 +36,11 @@ wss.on('connection', (ws) => {
 // Middleware
 app.use(express.json());
 app.use(clerkMiddleware());
-app.use(cors({ origin: "https://fed-storefront-frontend-dhanushka.netlify.app" }));
+app.use(cors({
+  origin: ["http://localhost:5173", "https://fed-storefront-frontend-dhanushka.netlify.app"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
 
 
 // Routes
