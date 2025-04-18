@@ -12,16 +12,21 @@ export const getProducts = async (
 ) => {
   try {
     const { categoryId } = req.query;
-    if (!categoryId) {
-      const data = await Product.find();
-      res.status(200).json(data);
-      return;
+    let data;
+
+    if (categoryId) {
+      data = await Product.find({ categoryId });
+    } else {
+      data = await Product.find();
     }
 
-    const data = await Product.find({ categoryId });
-    res.status(200).json(data);
-    return;
+    if (!data || data.length === 0) {
+      throw new NotFoundError("No products found");
+    }
+
+    res.json(data);
   } catch (error) {
+    console.error("Error in getProducts:", error);
     next(error);
   }
 };

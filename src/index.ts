@@ -13,34 +13,6 @@ import http from 'http';
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
 const app = express();
-app.use(express.json());
-app.use(clerkMiddleware());
-app.use(cors({
-  origin: ["http://localhost:5173", "https://fed-storefront-frontend-dhanushka.netlify.app"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true
-}));
-
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      'https://fed-storefront-frontend-dhanushka.netlify.app',
-      'http://localhost:5173'
-    ];
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
-
-app.options("*", cors()); // Respond to preflight requests globally
-app.use((req, res, next) => {
-  console.log("Request received:", req.method, req.path);
-  next();
-});
 
 // Create HTTP server
 const server = http.createServer(app);
@@ -62,8 +34,32 @@ wss.on('connection', (ws) => {
 });
 
 // Middleware
+app.use(express.json());
+app.use(clerkMiddleware());
 
+// CORS configuration
+const allowedOrigins = [
+  'https://fed-storefront-frontend-dhanushka.netlify.app',
+  'http://localhost:5173'
+];
 
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
+
+// Logging middleware
+app.use((req, res, next) => {
+  console.log("Request received:", req.method, req.path);
+  next();
+});
 
 // Routes
 app.use("/api/products", productRouter);
@@ -71,8 +67,10 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/payments", paymentsRouter);
 
-// Error handling
-app.use(globalErrorHandlingMiddleware);
+// Error handling middleware (must be last)
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  globalErrorHandlingMiddleware(err, req, res, next);
+});
 
 // Database connection
 connectDB();
