@@ -40,7 +40,8 @@ app.use(clerkMiddleware());
 // CORS configuration
 const allowedOrigins = [
   'https://fed-storefront-frontend-dhanushka.netlify.app',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'http://localhost:3000'  // Added frontend development server
 ];
 
 app.use(cors({
@@ -48,6 +49,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('Blocked by CORS:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -57,7 +59,7 @@ app.use(cors({
 
 // Logging middleware
 app.use((req, res, next) => {
-  console.log("Request received:", req.method, req.path);
+  console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
   next();
 });
 
@@ -77,7 +79,8 @@ connectDB();
 
 // Start server
 const PORT = process.env.PORT || 8000;
-server.listen(PORT, () => 
-  console.log(`Server running on port ${PORT}`)
-);
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log('Allowed origins:', allowedOrigins);
+});
   
